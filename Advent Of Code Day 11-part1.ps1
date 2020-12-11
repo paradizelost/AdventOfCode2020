@@ -1,7 +1,8 @@
 function Get-OpenSeatCount {
     param (
         [int]$seatrow,
-        [int]$seatnum
+        [int]$seatnum,
+        $seatmap
     )
     $seatrow.gettype()
     $seatnum.gettype()
@@ -11,14 +12,14 @@ function Get-OpenSeatCount {
     $seatnum.gettype()
     write-host "Input: $seatrow , $seatnum"
     $positionstocheck=@{}
-    $positionstocheck.add('UpperLeft',@($seatrow -1,$seatnum -1))
-    $positionstocheck.add('UpperMiddle',@($seatrow -1,$seatnum))
-    $positionstocheck.add('UpperRight',@($seatrow -1,$seatnum +1))
-    $positionstocheck.add('Left',@($seatrow,$seatnum -1))
-    $positionstocheck.add('Right',@($seatrow,$seatnum +1))
-    $positionstocheck.add('LowerLeft',@($seatrow +1,$seatnum -1))
-    $positionstocheck.add('LowerMiddle',@($seatrow +1,$seatnum))
-    $positionstocheck.add('LowerRight',@($seatrow +1,$seatnum +1))
+    $positionstocheck.add('UpperLeft',@(($seatrow -1),($seatnum -1)))
+    $positionstocheck.add('UpperMiddle',@(($seatrow -1),($seatnum)))
+    $positionstocheck.add('UpperRight',@(($seatrow -1),($seatnum +1)))
+    $positionstocheck.add('Left',@(($seatrow),($seatnum -1)))
+    $positionstocheck.add('Right',@(($seatrow),($seatnum +1)))
+    $positionstocheck.add('LowerLeft',@(($seatrow +1),($seatnum -1)))
+    $positionstocheck.add('LowerMiddle',@(($seatrow +1),($seatnum)))
+    $positionstocheck.add('LowerRight',@(($seatrow +1),($seatnum +1)))
     $occupiedSeats=0
     foreach($position in $positionstocheck.keys){
         $row,$num = $positionstocheck.$position
@@ -28,5 +29,30 @@ function Get-OpenSeatCount {
     }
     return $occupiedSeats
 }
+function proc-Seats(){
+    param(
+        $seatmap
+    )
+    for($row=0;$row -lt $seatmap.count; $row++){
+        for($seatnum=0, $seatnum -lt $seatmap[$row].ToCharArray().count){
+            if((Get-OpenSeatCount -seatrow $row -seatnum $seatnum -seatmap $seatmap) -ge 4){
+                $seatmap[$row][$seatnum]='L'
+            } else {
+                $seatmap[$row][$seatnum]='#'
+            }
+        }
+    }
+    $seatmap
+}
 $seatmap = get-content .\aocd11input.txt
-Get-OpenSeatCount -seatrow 33 -seatnum 5
+$nochangesin=0
+do{
+    $oldseatmap = $seatmap
+    $seatmap = proc-Seats -seatmap $seatmap
+    if($oldseatmap -eq $seatmap){
+        $nochangesin++
+    }
+} while (
+    $nochangesin -lt 3
+)
+
