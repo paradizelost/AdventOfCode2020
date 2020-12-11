@@ -17,8 +17,12 @@ function Get-OpenSeatCount {
     foreach($position in $positionstocheck.keys){
         $row,$num = $positionstocheck.$position
         $myrow = $seatmap[$row]
-        if($myrow[$num] -eq '#'){
-            $occupiedSeats++
+        try{
+            if($myrow[$num] -eq '#'){
+                $occupiedSeats++
+            }
+        } catch{
+
         }
     }
     return [int]$occupiedSeats
@@ -27,8 +31,8 @@ function proc-Seats(){
     param(
         $seatmap
     )
-    for($row=0;$row -lt $seatmap.count - 1; $row++){
-        for($seatnum=0; $seatnum -lt ($seatmap[$row].ToCharArray().count -1); $seatnum++){
+    for($row=0;$row -lt $seatmap.count; $row++){
+        for($seatnum=0; $seatnum -lt ($seatmap[$row].ToCharArray().count); $seatnum++){
             if($seatmap[$row][$seatnum] -ne '.'){
                 $occupiedseats = Get-OpenSeatCount -seatrow $row -seatnum $seatnum -seatmap $seatmap
                 #write-host "Occupied Around $occupiedseats, SEATNUM $seatnum, SEATROW $row"
@@ -47,13 +51,17 @@ function proc-Seats(){
 }
 $seatmap = @(get-content .\aocd11input.txt)
 $nochangesin=0
+$loopnum=0
 do{
-    $oldseatmap = $seatmap
+    $loopnum++
+    write-host "Loop $loopnum"
+    $oldseatmap = @($seatmap)
     $seatmap = proc-Seats -seatmap $seatmap
-    if($oldseatmap -eq $seatmap){
+    if(($oldseatmap -join "") -eq ($seatmap -join "")){
         $nochangesin++
     }
+    #$seatmap
 } while (
     $nochangesin -lt 3
 )
-
+(($seatmap -join "").tochararray()|?{$_ -eq '#'}).count
