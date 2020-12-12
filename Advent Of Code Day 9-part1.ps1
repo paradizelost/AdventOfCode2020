@@ -35,3 +35,4 @@ for($i=25; $i -lt $inputdata.count; $i++){
     $null,$mynumbers=$mynumbers
     $mynumbers += $newnum
 }
+get-date

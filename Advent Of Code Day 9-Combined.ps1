@@ -1,3 +1,4 @@
+get-date 
 $inputdata=import-csv -header "Number" .\aocd9input.txt
 $inputdata | %{$_.Number = [int64]$_.Number}
 $buffer=25
@@ -66,3 +67,4 @@ foreach($num in ($howmanynums .. $inputdata.count)){
         #write-host "$mynums : $mysum"
     }
 }
+get-date
